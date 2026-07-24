@@ -17,7 +17,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <meta name="format-detection" content="telphone=no, email=no" />
   
-    <meta name="keywords" content="编程" />
+    <meta name="keywords" content="BFS, 动态规划, 最短路, 洛谷, 状压DP, 题解" />
   
   <meta name="description" content="题目链接：U708162 打野规划  写在前面这道题是我第一次出题，灵感来源于某天打野连跪之后——刷野顺序不对，经济被对面压了一截，然后团战打不过，然后就输了。 于是我在想：如果给定一个地图、一组野怪、一个时间限制，能不能用程序算出最优刷野路线？这道题就这么诞生了。 题意简述你有一个 n*m 的网格地图：  S 是泉水（起点） # 是障碍物（不能走） . 是空地  地图上有 K 个野怪营地（K">
 <meta property="og:type" content="article">
@@ -28,9 +28,14 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/assets/favicon.png">
 <meta property="article:published_time" content="2026-07-24T11:33:05.000Z">
-<meta property="article:modified_time" content="2026-07-24T11:37:05.996Z">
+<meta property="article:modified_time" content="2026-07-24T12:22:38.746Z">
 <meta property="article:author" content="Simple">
-<meta property="article:tag" content="编程">
+<meta property="article:tag" content="BFS">
+<meta property="article:tag" content="动态规划">
+<meta property="article:tag" content="最短路">
+<meta property="article:tag" content="洛谷">
+<meta property="article:tag" content="状压DP">
+<meta property="article:tag" content="题解">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/assets/favicon.png">
   
@@ -38,7 +43,7 @@
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"打野规划 题解","description":"\n题目链接：U708162 打野规划\n\n","image":"http://example.com/assets/avatar.webp","author":{"@type":"Person","name":"Simple"},"publisher":{"@type":"Organization","name":"Simple's Blog","logo":{"@type":"ImageObject","url":"http://example.com/assets/avatar.webp"}},"datePublished":"2026-07-24T11:33:05.000Z","dateModified":"2026-07-24T11:37:05.996Z","mainEntityOfPage":{"@type":"WebPage","@id":"http://example.com/2026/07/24/%E6%89%93%E9%87%8E%E8%A7%84%E5%88%92-%E9%A2%98%E8%A7%A3/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"打野规划 题解","description":"\n题目链接：U708162 打野规划\n\n","image":"http://example.com/assets/avatar.webp","author":{"@type":"Person","name":"Simple"},"publisher":{"@type":"Organization","name":"Simple's Blog","logo":{"@type":"ImageObject","url":"http://example.com/assets/avatar.webp"}},"datePublished":"2026-07-24T11:33:05.000Z","dateModified":"2026-07-24T12:22:38.746Z","mainEntityOfPage":{"@type":"WebPage","@id":"http://example.com/2026/07/24/%E6%89%93%E9%87%8E%E8%A7%84%E5%88%92-%E9%A2%98%E8%A7%A3/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -310,14 +315,23 @@
             <div class="footer-tag clearfix">
                 <div class="pull-left">
                 <i class="fa fa-tags"></i>
-                    <a class="tag-none-link" href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a>
+                    <a class="tag-none-link" href="/tags/BFS/" rel="tag">BFS</a>, <a class="tag-none-link" href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" rel="tag">动态规划</a>, <a class="tag-none-link" href="/tags/%E6%9C%80%E7%9F%AD%E8%B7%AF/" rel="tag">最短路</a>, <a class="tag-none-link" href="/tags/%E6%B4%9B%E8%B0%B7/" rel="tag">洛谷</a>, <a class="tag-none-link" href="/tags/%E7%8A%B6%E5%8E%8BDP/" rel="tag">状压DP</a>, <a class="tag-none-link" href="/tags/%E9%A2%98%E8%A7%A3/" rel="tag">题解</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-07-24T11:37:05.996Z" itemprop="dateModified">最后编辑：2026-07-24</time>
+                    <time datetime="2026-07-24T12:22:38.746Z" itemprop="dateModified">最后编辑：2026-07-24</time>
                 </div>
             </div>
         </footer>
     </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" 从零搭建个人博客：GitHub Pages + Hexo 完整指南" href="/2026/07/24/从零搭建个人博客：GitHub-Pages-Hexo-完整指南/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
     
     
         <div class="comment-post">
@@ -353,7 +367,7 @@
                 文章
             </span>
             <span class="count">
-                1
+                2
             </span>
         </a>
         <a class="meta-item" href="/categories/">
@@ -361,7 +375,7 @@
                 分类
             </span>
             <span class="count">
-                0
+                2
             </span>
         </a>
         <a class="meta-item" href="/tags/">
@@ -369,7 +383,7 @@
                 标签
             </span>
             <span class="count">
-                1
+                12
             </span>
         </a>
     </div>
@@ -378,13 +392,18 @@
                     <div class="sticky-area">
                 
                 
+  <aside id="krw-categories" class="widget widget-kratos-categories clearfix">
+    <h4 class="widget-title"><i class="fa fa-folder"></i>分类列表</h4>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%99%E7%A8%8B/">教程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95%E9%A2%98%E8%A7%A3/">算法题解</a><span class="category-list-count">1</span></li></ul>
+  </aside>
+
 
             
                 
   <aside id="krw-tags" class="widget widget-kratos-tags clearfix">
     <h4 class="widget-title"><i class="fa fa-tags"></i>标签聚合</h4>
       <div class="tag-clouds">
-        <a href="/tags/%E7%BC%96%E7%A8%8B/" style="font-size: 0.6em;">编程</a>
+        <a href="/tags/BFS/" style="font-size: 0.6em;">BFS</a> <a href="/tags/GitHub-Pages/" style="font-size: 0.6em;">GitHub Pages</a> <a href="/tags/Hexo/" style="font-size: 0.6em;">Hexo</a> <a href="/tags/Node-js/" style="font-size: 0.6em;">Node.js</a> <a href="/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 0.6em;">前端</a> <a href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" style="font-size: 0.6em;">动态规划</a> <a href="/tags/%E5%8D%9A%E5%AE%A2/" style="font-size: 0.6em;">博客</a> <a href="/tags/%E6%9C%80%E7%9F%AD%E8%B7%AF/" style="font-size: 0.6em;">最短路</a> <a href="/tags/%E6%B4%9B%E8%B0%B7/" style="font-size: 0.6em;">洛谷</a> <a href="/tags/%E7%8A%B6%E5%8E%8BDP/" style="font-size: 0.6em;">状压DP</a> <a href="/tags/%E9%83%A8%E7%BD%B2/" style="font-size: 0.6em;">部署</a> <a href="/tags/%E9%A2%98%E8%A7%A3/" style="font-size: 0.6em;">题解</a>
       </div>
   </aside>
 
@@ -395,6 +414,12 @@
   <div class="tab-content">
       <ul class="list-group">
         
+        
+          
+          
+            <a class="list-group-item" href="/2026/07/24/%E4%BB%8E%E9%9B%B6%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%EF%BC%9AGitHub-Pages-Hexo-%E5%AE%8C%E6%95%B4%E6%8C%87%E5%8D%97/"><i class="fa fa-book"></i> 从零搭建个人博客：GitHub Pages + Hexo 完整指南</a>
+            
+          
         
           
           
