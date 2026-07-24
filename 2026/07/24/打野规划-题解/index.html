@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+    <link rel="icon" href="/assets/favicon.png">
+  
+  
+  <title>打野规划 题解 | Simple&#39;s Blog</title>
+  <link rel="canonical" href="http://example.com/2026/07/24/%E6%89%93%E9%87%8E%E8%A7%84%E5%88%92-%E9%A2%98%E8%A7%A3/">
+  <meta name="author" content="Simple" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="编程" />
+  
+  <meta name="description" content="题目链接：U708162 打野规划  写在前面这道题是我第一次出题，灵感来源于某天打野连跪之后——刷野顺序不对，经济被对面压了一截，然后团战打不过，然后就输了。 于是我在想：如果给定一个地图、一组野怪、一个时间限制，能不能用程序算出最优刷野路线？这道题就这么诞生了。 题意简述你有一个 n*m 的网格地图：  S 是泉水（起点） # 是障碍物（不能走） . 是空地  地图上有 K 个野怪营地（K">
+<meta property="og:type" content="article">
+<meta property="og:title" content="打野规划 题解">
+<meta property="og:url" content="http://example.com/2026/07/24/%E6%89%93%E9%87%8E%E8%A7%84%E5%88%92-%E9%A2%98%E8%A7%A3/index.html">
+<meta property="og:site_name" content="Simple&#39;s Blog">
+<meta property="og:description" content="题目链接：U708162 打野规划  写在前面这道题是我第一次出题，灵感来源于某天打野连跪之后——刷野顺序不对，经济被对面压了一截，然后团战打不过，然后就输了。 于是我在想：如果给定一个地图、一组野怪、一个时间限制，能不能用程序算出最优刷野路线？这道题就这么诞生了。 题意简述你有一个 n*m 的网格地图：  S 是泉水（起点） # 是障碍物（不能走） . 是空地  地图上有 K 个野怪营地（K">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/assets/favicon.png">
+<meta property="article:published_time" content="2026-07-24T11:33:05.000Z">
+<meta property="article:modified_time" content="2026-07-24T11:37:05.996Z">
+<meta property="article:author" content="Simple">
+<meta property="article:tag" content="编程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/assets/favicon.png">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"打野规划 题解","description":"\n题目链接：U708162 打野规划\n\n","image":"http://example.com/assets/avatar.webp","author":{"@type":"Person","name":"Simple"},"publisher":{"@type":"Organization","name":"Simple's Blog","logo":{"@type":"ImageObject","url":"http://example.com/assets/avatar.webp"}},"datePublished":"2026-07-24T11:33:05.000Z","dateModified":"2026-07-24T11:37:05.996Z","mainEntityOfPage":{"@type":"WebPage","@id":"http://example.com/2026/07/24/%E6%89%93%E9%87%8E%E8%A7%84%E5%88%92-%E9%A2%98%E8%A7%A3/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('https://dev.krt.moe/demo-assets/banner.webp');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('https://dev.krt.moe/demo-assets/banner_dark.webp');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('https://dev.krt.moe/demo-assets/bg.webp');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('https://dev.krt.moe/demo-assets/bg.webp');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+    <meta name="msvalidate.01" content="9E75CAF65758050F2F7226D49C6E27CD" />
+<style>
+  #kratos-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  #kratos-page {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 auto;
+  }
+  #kratos-blog-post {
+    flex: 1 0 auto;
+  }
+  @media (max-width: 991px) {
+    footer #footer,
+    footer #footer .container {
+      width: 100% !important;
+      margin: 0 !important;
+      max-width: 100% !important;
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+    footer #footer .container .col-md-6 {
+      width: 100%;
+      margin: 0;
+    }
+    footer #footer .container .col-md-6 .kratos-copyright div {
+      margin: 0;
+    }
+  }
+</style>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                                    <li>
+                                        
+                                            <a href="/">
+                                        
+                                            
+                                                <i class="fa fa-home"></i>
+                                            
+                                            首页
+                                        </a>
+                                        
+                                    </li>
+                                
+                                    <li>
+                                        
+                                            <a href="/archives/">
+                                        
+                                            
+                                                <i class="fa fa-file"></i>
+                                            
+                                            档案馆
+                                        </a>
+                                        
+                                    </li>
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/">Simple&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/">
+                        <h2>Simple&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/24/%E6%89%93%E9%87%8E%E8%A7%84%E5%88%92-%E9%A2%98%E8%A7%A3/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">打野规划 题解</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-07-24T11:33:05.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-07-24</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Simple</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~5.16K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><blockquote>
+<p>题目链接：<a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/U708162">U708162 打野规划</a></p>
+</blockquote>
+<h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p>这道题是我第一次出题，灵感来源于某天打野连跪之后——刷野顺序不对，经济被对面压了一截，然后团战打不过，然后就输了。</p>
+<p>于是我在想：如果给定一个地图、一组野怪、一个时间限制，能不能用程序算出最优刷野路线？这道题就这么诞生了。</p>
+<h2 id="题意简述"><a href="#题意简述" class="headerlink" title="题意简述"></a>题意简述</h2><p>你有一个 <code>n*m</code> 的网格地图：</p>
+<ul>
+<li><code>S</code> 是泉水（起点）</li>
+<li><code>#</code> 是障碍物（不能走）</li>
+<li><code>.</code> 是空地</li>
+</ul>
+<p>地图上有 <code>K</code> 个野怪营地（<code>K ≤ 15</code>），每个野怪有：</p>
+<ul>
+<li>坐标 <code>(x, y)</code></li>
+<li>血量 <code>hp</code></li>
+<li>金币 <code>gold</code></li>
+</ul>
+<p>你有初始攻击力 <code>ATK</code>，每次攻击造成 <code>当前攻击力</code> 的伤害，攻击间隔 1 秒。<br>每击杀一个野怪，攻击力永久增加 <code>INC</code>。</p>
+<p>移动：上下左右走一格，耗时 1 秒，不能穿墙。<br>击杀：耗时 <code>ceil(hp / 当前攻击力)</code> 秒。</p>
+<p>问：在 <code>T</code> 秒内，从泉水出发，最多能获得多少金币？<strong>不用回泉水。</strong></p>
+<h2 id="思路分析"><a href="#思路分析" class="headerlink" title="思路分析"></a>思路分析</h2><p>这题有两个难点：</p>
+<ol>
+<li>地图有障碍物，任意两点之间的最短移动时间不能直接算曼哈顿距离。</li>
+<li>攻击力会变，击杀顺序影响后续效率，所以不能贪心。</li>
+</ol>
+<h3 id="第一步：BFS-预处理"><a href="#第一步：BFS-预处理" class="headerlink" title="第一步：BFS 预处理"></a>第一步：BFS 预处理</h3><p>地图上的关键点只有 <code>K+1</code> 个：泉水 + <code>K</code> 个野怪。</p>
+<p>对每个关键点跑一次 BFS，计算出它到其他所有关键点的最短移动时间，存到 <code>dist[i][j]</code> 里。</p>
+<p>这样后面 DP 的时候，<code>i</code> 到 <code>j</code> 的移动时间直接查表就行。</p>
+<p>复杂度：<code>O((K+1) * n * m)</code>，<code>K≤15</code> 完全够用。</p>
+<h3 id="第二步：状压-DP"><a href="#第二步：状压-DP" class="headerlink" title="第二步：状压 DP"></a>第二步：状压 DP</h3><p><code>K ≤ 15</code>，很明显的状压范围。</p>
+<p>定义 <code>dp[mask][i]</code>：</p>
+<ul>
+<li>已经击杀的野怪集合是 <code>mask</code></li>
+<li>当前在第 <code>i</code> 个野怪的位置</li>
+<li>值 &#x3D; 达到这个状态的最小耗时</li>
+</ul>
+<p>转移：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; K; j++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (mask &amp; (<span class="number">1</span> &lt;&lt; j)) <span class="keyword">continue</span>;  <span class="comment">// 已经杀过了</span></span><br><span class="line">    <span class="type">int</span> cnt = <span class="built_in">popcount</span>(mask);</span><br><span class="line">    <span class="type">int</span> atk = ATK + cnt * INC;      <span class="comment">// 当前攻击力</span></span><br><span class="line">    <span class="type">int</span> kill = (hp[j] + atk - <span class="number">1</span>) / atk;</span><br><span class="line">    <span class="type">int</span> t = dp[mask][i] + dist[i<span class="number">+1</span>][j<span class="number">+1</span>] + kill;</span><br><span class="line">    dp[mask | (<span class="number">1</span> &lt;&lt; j)][j] = <span class="built_in">min</span>(dp[mask | (<span class="number">1</span> &lt;&lt; j)][j], t);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>初始化：从泉水直接去杀第一个野怪 <code>i</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dp[1 &lt;&lt; i][i] = dist[0][i+1] + kill_time(i)</span><br></pre></td></tr></table></figure>
+
+<p>最后统计答案：枚举所有 <code>mask</code> 和 <code>i</code>，如果 <code>dp[mask][i] ≤ T</code>，就更新答案。</p>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> INF = <span class="number">1e9</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Monster</span> &#123;</span><br><span class="line">    <span class="type">int</span> x, y, hp, gold;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> n, m, T, ATK, INC;</span><br><span class="line">vector&lt;string&gt; grid;</span><br><span class="line"><span class="type">int</span> K;</span><br><span class="line">vector&lt;Monster&gt; mon;</span><br><span class="line"><span class="type">int</span> dx[<span class="number">4</span>] = &#123;<span class="number">1</span>, <span class="number">-1</span>, <span class="number">0</span>, <span class="number">0</span>&#125;;</span><br><span class="line"><span class="type">int</span> dy[<span class="number">4</span>] = &#123;<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">-1</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    ios::<span class="built_in">sync_with_stdio</span>(<span class="literal">false</span>);</span><br><span class="line">    cin.<span class="built_in">tie</span>(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    cin &gt;&gt; n &gt;&gt; m &gt;&gt; T &gt;&gt; ATK &gt;&gt; INC;</span><br><span class="line">    grid.<span class="built_in">resize</span>(n);</span><br><span class="line">    pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt; start;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        cin &gt;&gt; grid[i];</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; m; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (grid[i][j] == <span class="string">&#x27;S&#x27;</span>) start = &#123;i, j&#125;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cin &gt;&gt; K;</span><br><span class="line">    mon.<span class="built_in">resize</span>(K);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; K; i++) &#123;</span><br><span class="line">        cin &gt;&gt; mon[i].x &gt;&gt; mon[i].y &gt;&gt; mon[i].hp &gt;&gt; mon[i].gold;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ========== BFS 预处理 ==========</span></span><br><span class="line">    vector&lt;pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&gt; points;</span><br><span class="line">    points.<span class="built_in">push_back</span>(start);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> &amp;m : mon) points.<span class="built_in">push_back</span>(&#123;m.x, m.y&#125;);</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> P = K + <span class="number">1</span>;</span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">dist</span>(P, <span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(P, INF));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> s = <span class="number">0</span>; s &lt; P; s++) &#123;</span><br><span class="line">        vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">d</span>(n, <span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(m, INF));</span><br><span class="line">        queue&lt;pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&gt; q;</span><br><span class="line">        <span class="keyword">auto</span> [sx, sy] = points[s];</span><br><span class="line">        d[sx][sy] = <span class="number">0</span>;</span><br><span class="line">        q.<span class="built_in">push</span>(&#123;sx, sy&#125;);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (!q.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">            <span class="keyword">auto</span> [x, y] = q.<span class="built_in">front</span>(); q.<span class="built_in">pop</span>();</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> dir = <span class="number">0</span>; dir &lt; <span class="number">4</span>; dir++) &#123;</span><br><span class="line">                <span class="type">int</span> nx = x + dx[dir], ny = y + dy[dir];</span><br><span class="line">                <span class="keyword">if</span> (nx &lt; <span class="number">0</span> || nx &gt;= n || ny &lt; <span class="number">0</span> || ny &gt;= m) <span class="keyword">continue</span>;</span><br><span class="line">                <span class="keyword">if</span> (grid[nx][ny] == <span class="string">&#x27;#&#x27;</span>) <span class="keyword">continue</span>;</span><br><span class="line">                <span class="keyword">if</span> (d[nx][ny] != INF) <span class="keyword">continue</span>;</span><br><span class="line">                d[nx][ny] = d[x][y] + <span class="number">1</span>;</span><br><span class="line">                q.<span class="built_in">push</span>(&#123;nx, ny&#125;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> t = <span class="number">0</span>; t &lt; P; t++) &#123;</span><br><span class="line">            <span class="keyword">auto</span> [tx, ty] = points[t];</span><br><span class="line">            dist[s][t] = d[tx][ty];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ========== 状压 DP ==========</span></span><br><span class="line">    <span class="type">int</span> full = <span class="number">1</span> &lt;&lt; K;</span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">dp</span>(full, <span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(K, INF));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; K; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (dist[<span class="number">0</span>][i + <span class="number">1</span>] &gt;= INF) <span class="keyword">continue</span>;</span><br><span class="line">        <span class="type">int</span> kill = (mon[i].hp + ATK - <span class="number">1</span>) / ATK;</span><br><span class="line">        dp[<span class="number">1</span> &lt;&lt; i][i] = dist[<span class="number">0</span>][i + <span class="number">1</span>] + kill;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> mask = <span class="number">0</span>; mask &lt; full; mask++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; K; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!(mask &amp; (<span class="number">1</span> &lt;&lt; i))) <span class="keyword">continue</span>;</span><br><span class="line">            <span class="keyword">if</span> (dp[mask][i] &gt; T) <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">            <span class="type">int</span> cnt = __builtin_popcount(mask);</span><br><span class="line">            <span class="type">int</span> atk = ATK + cnt * INC;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; K; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (mask &amp; (<span class="number">1</span> &lt;&lt; j)) <span class="keyword">continue</span>;</span><br><span class="line">                <span class="keyword">if</span> (dist[i + <span class="number">1</span>][j + <span class="number">1</span>] &gt;= INF) <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">                <span class="type">int</span> kill = (mon[j].hp + atk - <span class="number">1</span>) / atk;</span><br><span class="line">                <span class="type">int</span> nt = dp[mask][i] + dist[i + <span class="number">1</span>][j + <span class="number">1</span>] + kill;</span><br><span class="line"></span><br><span class="line">                dp[mask | (<span class="number">1</span> &lt;&lt; j)][j] = <span class="built_in">min</span>(dp[mask | (<span class="number">1</span> &lt;&lt; j)][j], nt);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ========== 统计答案 ==========</span></span><br><span class="line">    <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">sumGold</span><span class="params">(full, <span class="number">0</span>)</span></span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> mask = <span class="number">0</span>; mask &lt; full; mask++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; K; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (mask &amp; (<span class="number">1</span> &lt;&lt; i)) sumGold[mask] += mon[i].gold;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> ans = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> mask = <span class="number">0</span>; mask &lt; full; mask++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; K; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (dp[mask][i] &lt;= T) &#123;</span><br><span class="line">                ans = <span class="built_in">max</span>(ans, sumGold[mask]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; ans &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="复杂度分析"><a href="#复杂度分析" class="headerlink" title="复杂度分析"></a>复杂度分析</h2><ul>
+<li>BFS：<code>O((K+1) * n * m)</code></li>
+<li>DP：<code>O(K^2 * 2^K)</code></li>
+</ul>
+<p><code>K ≤ 15</code>，最多 <code>15^2 * 32768 ≈ 737 万</code> 次转移，跑得飞快。</p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>第一次出题，代码和数据可能还有不完善的地方，如果发现了 bug 或者有更好的思路，欢迎在评论区告诉我。</p>
+<p>祝大家刷野愉快，把把顶级打野</p>
+</div>
+        </div>
+        
+            <div class="kratos-copyright text-center clearfix">
+                <span itemprop="copyrightNotice">[object Object]</span>
+            </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-07-24T11:37:05.996Z" itemprop="dateModified">最后编辑：2026-07-24</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    
+        <div class="comment-post">
+            
+        </div>
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+    
+                <aside id="krw-about" class="widget widget-kratos-about clearfix">
+    <div class="photo-background"></div>
+    <div class="photo-wrapper clearfix">
+        <div class="photo-wrapper-tip text-center">
+            <img class="about-photo" src="/assets/avatar.webp" alt="Simple" loading="lazy" decoding="auto" />
+        </div>
+    </div>
+    <div class="textwidget">
+        <p class="text-center"></p>
+    </div>
+    <div class="site-meta">
+        <a class="meta-item" href="/archives/">
+            <span class="title">
+                文章
+            </span>
+            <span class="count">
+                1
+            </span>
+        </a>
+        <a class="meta-item" href="/categories/">
+            <span class="title">
+                分类
+            </span>
+            <span class="count">
+                0
+            </span>
+        </a>
+        <a class="meta-item" href="/tags/">
+            <span class="title">
+                标签
+            </span>
+            <span class="count">
+                1
+            </span>
+        </a>
+    </div>
+</aside>
+            
+                    <div class="sticky-area">
+                
+                
+
+            
+                
+  <aside id="krw-tags" class="widget widget-kratos-tags clearfix">
+    <h4 class="widget-title"><i class="fa fa-tags"></i>标签聚合</h4>
+      <div class="tag-clouds">
+        <a href="/tags/%E7%BC%96%E7%A8%8B/" style="font-size: 0.6em;">编程</a>
+      </div>
+  </aside>
+
+            
+                
+  <aside id="krw-posts" class="widget widget-kratos-posts">
+  <h4 class="widget-title"><i class="fa fa-file"></i>最新文章</h4>
+  <div class="tab-content">
+      <ul class="list-group">
+        
+        
+          
+          
+            <a class="list-group-item" href="/2026/07/24/%E6%89%93%E9%87%8E%E8%A7%84%E5%88%92-%E9%A2%98%E8%A7%A3/"><i class="fa fa-book"></i> 打野规划 题解</a>
+            
+          
+        
+      </ul>
+  </div>
+  </aside>
+
+            
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                            <li>
+                                <a href="https://github.com/aimineng" target="_blank" rel="nofollow">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Simple's Blog 版权所有.</li>
+                            <li>本站已在风雨中飘摇<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">赞助喵</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">非常感谢您的喜欢！ <i class="fa fa-heart" style="color:#d43f57"></i></div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+                    <img class="kr-donate-placeholder" src="https://dev.krt.moe/demo-assets/donate.webp" alt="赞助喵" />
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+                    
+                        <button class="kr-donate-platform-button" style="color: skyblue;" title="模拟支付" onclick="krDonateModalShowPlatformQR('example_payment', 'skyblue')">
+                            <i class="fa fa-credit-card"></i>
+                        </button>
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享这一刻</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">让朋友们也来瞅瞅！</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+                    <button class="kr-share-platform-button" style="color: #62b6e7;" title="喵窝" onclick="krShareModalOpenPlatform('https://nya.one/share?text=%3E%20$TITLE%0A%3E%0A%3E%20$SUMMARY%0A----%20$SITE%0A%0A$URL')">
+                        <svg fill="currentColor" width="18" height="18" viewBox="0 0 329 388"><path d="M0,36.226c0,-19.993 16.233,-36.226 36.226,-36.226c13.788,0 25.787,7.719 31.908,19.068l188.366,229.845l0,-111.259c-6.356,5.508 -14.645,8.843 -23.707,8.843c-19.994,0 -36.226,-16.232 -36.226,-36.226c-0,-8.551 2.968,-16.413 7.93,-22.613l-0.015,-0.013l56.614,-69.08c6.2,-11.073 18.047,-18.565 31.63,-18.565c19.994,0 36.227,16.233 36.227,36.226l-0,314.644c-0,19.994 -16.233,36.226 -36.227,36.226c-13.166,0 -24.701,-7.039 -31.044,-17.555l-189.229,-230.899l-0,212.228c-0,19.994 -16.233,36.226 -36.227,36.226c-19.993,0 -36.226,-16.232 -36.226,-36.226l0,-314.644Z" /></svg>
+                    </button>
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/";
+</script>
+
+
+  <script defer src="/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/js/kr-core.min.js"></script>
+
+
+  <script defer src="/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+  <script type="text/javascript" id="myhk" src="https://myhkw.cn/api/player/178480982411" key="178480982411" m="1"></script>
+
+
+
+    <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/poi.model.json"},"display":{"superSample":2,"position":"left","width":300,"height":450,"hOffset":0,"vOffset":-20},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false});</script></body>
+</html>
